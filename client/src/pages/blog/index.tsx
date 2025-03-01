@@ -11,9 +11,20 @@ import { useState } from "react";
 
 export default function BlogList() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: blogs, isLoading } = useQuery<Blog[]>({
+  // const { data: blogs, isLoading } = useQuery<Blog[]>({
+  //   queryKey: ["/api/blogs"],
+  // });
+  const { data: blogs, isLoading, error } = useQuery<Blog[]>({
     queryKey: ["/api/blogs"],
+    queryFn: async () => {
+      const response = await fetch("/api/blogs");
+      if (!response.ok) {
+        throw new Error("Failed to fetch blogs");
+      }
+      return response.json();
+    }
   });
+  
 
   const filteredBlogs = blogs?.filter(blog => 
     blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
